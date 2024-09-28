@@ -11,15 +11,15 @@ import com.khaled.almatarshoppinglist.domain.ShoppingItem
 @Dao
 interface ShoppingItemsDao {
 
-    @Query("SELECT * FROM shoppingitem WHERE is_bought = 1 ORDER BY " +
-            "CASE WHEN :isAsc = 1 THEN name END ASC," +
-            " CASE WHEN :isAsc = 0 THEN name END DESC")
-    suspend fun getBoughtItems(isAsc: Boolean): List<ShoppingItem>
+    @Query("SELECT * FROM shoppingitem WHERE is_bought = 1 " +
+            "AND (CASE WHEN :query IS NOT NULL THEN name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ELSE 1 END) " +
+            "ORDER BY CASE WHEN :isAsc = 1 THEN name END ASC, CASE WHEN :isAsc = 0 THEN name END DESC")
+    suspend fun getBoughtItems(isAsc: Boolean, query: String?=null): List<ShoppingItem>
 
-    @Query("SELECT * FROM shoppingitem WHERE is_bought = 0 ORDER BY " +
-            "CASE WHEN :isAsc = 1 THEN name END ASC," +
-            " CASE WHEN :isAsc = 0 THEN name END DESC")
-    suspend fun getUnBoughtItems(isAsc: Boolean): List<ShoppingItem>
+    @Query("SELECT * FROM shoppingitem WHERE is_bought = 0 " +
+            "AND (CASE WHEN :query IS NOT NULL THEN name LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ELSE 1 END) " +
+            "ORDER BY CASE WHEN :isAsc = 1 THEN name END ASC, CASE WHEN :isAsc = 0 THEN name END DESC")
+    suspend fun getUnBoughtItems(isAsc: Boolean, query: String?=null): List<ShoppingItem>
 
     @Query("SELECT * FROM shoppingitem")
     suspend fun getAllItems(): List<ShoppingItem>

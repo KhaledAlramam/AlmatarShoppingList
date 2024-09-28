@@ -12,12 +12,12 @@ class ShoppingItemRepoImpl @Inject constructor(private val shoppingItemsDao: Sho
         return shoppingItemsDao.getAllItems()
     }
 
-    override suspend fun getBoughtItems(isAsc: Boolean): List<ShoppingItem> {
-        return shoppingItemsDao.getBoughtItems(isAsc)
+    override suspend fun getBoughtItems(isAsc: Boolean, query: String?): List<ShoppingItem> {
+        return shoppingItemsDao.getBoughtItems(isAsc, query)
     }
 
-    override suspend fun getUnBoughtItems(isAsc: Boolean): List<ShoppingItem> {
-        return shoppingItemsDao.getUnBoughtItems(isAsc)
+    override suspend fun getUnBoughtItems(isAsc: Boolean, query: String?): List<ShoppingItem> {
+        return shoppingItemsDao.getUnBoughtItems(isAsc, query)
     }
 
     override suspend fun insertItem(item: ShoppingItem) {

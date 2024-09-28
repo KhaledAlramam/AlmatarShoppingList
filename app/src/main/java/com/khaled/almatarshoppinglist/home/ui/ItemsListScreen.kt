@@ -32,6 +32,7 @@ import com.khaled.almatarshoppinglist.addedititem.AddEditItemScreen
 import com.khaled.almatarshoppinglist.domain.ShoppingItem
 import com.khaled.almatarshoppinglist.home.ui.components.AddItemFab
 import com.khaled.almatarshoppinglist.home.ui.components.FilterComposable
+import com.khaled.almatarshoppinglist.home.ui.components.SearchButtonWithTransition
 import com.khaled.almatarshoppinglist.home.ui.components.ShoppingListItemComp
 import com.khaled.almatarshoppinglist.presenter.viewmodel.ItemListScreenViewModel
 import com.khaled.almatarshoppinglist.util.FilterEnum
@@ -49,13 +50,14 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
     var selectedItem: ShoppingItem? by remember {
         mutableStateOf(null)
     }
+    var searchText by remember { mutableStateOf("") }
     var currentFilter by remember { mutableStateOf(FilterEnum.UNBOUGHT) }
-    LaunchedEffect(key1 = currentFilter, key2 = isAsc) {
-        viewModel.getItems(currentFilter.value, isAsc)
+    LaunchedEffect(key1 = currentFilter, key2 = isAsc, key3 = searchText) {
+        viewModel.getItems(currentFilter.value, isAsc, searchText)
     }
     LaunchedEffect(key1 = resultState) {
         if (resultState is Resource.Success) {
-            viewModel.getItems(currentFilter.value, isAsc)
+            viewModel.getItems(currentFilter.value, isAsc, searchText)
         }
     }
     Scaffold(floatingActionButton = {
@@ -70,7 +72,9 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
+            SearchButtonWithTransition {
+                searchText = it
+            }
             FilterComposable(currentFilter = currentFilter) { newFilter ->
                 currentFilter = newFilter
             }
@@ -116,7 +120,7 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
                     onSave = {
                         selectedItem = null
                         showAddEditBottomSheet = false
-                        viewModel.getItems(currentFilter.value, isAsc)
+                        viewModel.getItems(currentFilter.value, isAsc, searchText)
                     },
                     modifier = Modifier.padding(8.dp),
                     item = selectedItem
@@ -125,3 +129,4 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
         }
     }
 }
+
