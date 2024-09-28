@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.khaled.almatarshoppinglist.data.db.AppDatabase
 import com.khaled.almatarshoppinglist.data.db.ShoppingItemsDao
-import com.khaled.almatarshoppinglist.data.repoimp.ShoppingItemRepoImpl
-import com.khaled.almatarshoppinglist.domain.repo.ShoppingItemRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +26,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDao(appDatabase: AppDatabase) : ShoppingItemsDao{
+    fun provideDao(appDatabase: AppDatabase): ShoppingItemsDao {
         return appDatabase.shoppingItemsDao()
     }
 

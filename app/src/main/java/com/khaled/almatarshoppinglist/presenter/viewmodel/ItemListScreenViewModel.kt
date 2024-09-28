@@ -21,10 +21,10 @@ class ItemListScreenViewModel @Inject constructor(private val shoppingItemRepo: 
     private val _result = MutableStateFlow<Resource<Boolean>>(Resource.Idle)
     val result: StateFlow<Resource<Boolean>> = _result
 
-    fun getItems(isBought: Boolean) {
+    fun getItems(isBought: Boolean, isAsc: Boolean) {
         viewModelScope.launch {
-            if (isBought) _items.value = shoppingItemRepo.getBoughtItems()
-            else _items.value = shoppingItemRepo.getUnBoughtItems()
+            if (isBought) _items.value = shoppingItemRepo.getBoughtItems(isAsc)
+            else _items.value = shoppingItemRepo.getUnBoughtItems(isAsc)
         }
     }
 

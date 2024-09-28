@@ -6,9 +6,9 @@ interface ShoppingItemRepo {
 
     suspend fun getAllItems(): List<ShoppingItem>
 
-    suspend fun getBoughtItems(): List<ShoppingItem>
+    suspend fun getBoughtItems(isAsc: Boolean): List<ShoppingItem>
 
-    suspend fun getUnBoughtItems(): List<ShoppingItem>
+    suspend fun getUnBoughtItems(isAsc: Boolean): List<ShoppingItem>
 
     suspend fun insertItem(item: ShoppingItem)
 

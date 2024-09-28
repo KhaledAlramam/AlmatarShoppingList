@@ -1,14 +1,21 @@
 package com.khaled.almatarshoppinglist.home.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,7 +33,6 @@ import com.khaled.almatarshoppinglist.domain.ShoppingItem
 import com.khaled.almatarshoppinglist.home.ui.components.AddItemFab
 import com.khaled.almatarshoppinglist.home.ui.components.FilterComposable
 import com.khaled.almatarshoppinglist.home.ui.components.ShoppingListItemComp
-import com.khaled.almatarshoppinglist.home.ui.components.SortFilterRow
 import com.khaled.almatarshoppinglist.presenter.viewmodel.ItemListScreenViewModel
 import com.khaled.almatarshoppinglist.util.FilterEnum
 import com.khaled.almatarshoppinglist.util.Resource
@@ -38,16 +45,17 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
     val resultState by viewModel.result.collectAsState()
     val addEditBottomSheetState = rememberModalBottomSheetState()
     var showAddEditBottomSheet by remember { mutableStateOf(false) }
+    var isAsc by remember { mutableStateOf(true) }
     var selectedItem: ShoppingItem? by remember {
         mutableStateOf(null)
     }
     var currentFilter by remember { mutableStateOf(FilterEnum.UNBOUGHT) }
-    LaunchedEffect(key1 = currentFilter) {
-        viewModel.getItems(currentFilter.value)
+    LaunchedEffect(key1 = currentFilter, key2 = isAsc) {
+        viewModel.getItems(currentFilter.value, isAsc)
     }
-    LaunchedEffect(key1 =resultState ) {
-        if (resultState is Resource.Success){
-            viewModel.getItems(currentFilter.value)
+    LaunchedEffect(key1 = resultState) {
+        if (resultState is Resource.Success) {
+            viewModel.getItems(currentFilter.value, isAsc)
         }
     }
     Scaffold(floatingActionButton = {
@@ -66,6 +74,15 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
             FilterComposable(currentFilter = currentFilter) { newFilter ->
                 currentFilter = newFilter
             }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { isAsc = !isAsc }) {
+                Icon(
+                    imageVector = if (isAsc) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                    contentDescription = null
+                )
+                Text(text = "Sort")
+            }
 
             LazyColumn {
                 items(items.size) {
@@ -75,6 +92,9 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
                         onEditClick = {
                             selectedItem = item
                             showAddEditBottomSheet = true
+                        }, onBoughtClick = {
+                            val newItem = item.copy(isBought = true)
+                            viewModel.updateItem(newItem)
                         })
                 }
             }
@@ -96,7 +116,7 @@ fun ItemsListScreen(modifier: Modifier = Modifier) {
                     onSave = {
                         selectedItem = null
                         showAddEditBottomSheet = false
-                        viewModel.getItems(currentFilter.value)
+                        viewModel.getItems(currentFilter.value, isAsc)
                     },
                     modifier = Modifier.padding(8.dp),
                     item = selectedItem
